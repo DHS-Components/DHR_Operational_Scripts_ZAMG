@@ -1,0 +1,126 @@
+\documentclass{article}
+\usepackage[a4paper, total={6in, 10in}]{geometry}
+
+\usepackage{float}
+\usepackage{graphics}
+
+\begin{document}
+\title{KPI Report - YOUR INSTITUTION\vspace{-1cm}}
+
+\maketitle
+
+\section{Overall KPI}
+
+\subsection{Overview}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\multicolumn{2}{|c|}{\LARGE{KPI}} \\ \hline
+KPI-0010 & placeholder_kpi1_percentage\% \\ \hline
+KPI-0020 & placeholder_kpi2_percentage\% \\ \hline
+\multicolumn{2}{|c|}{\large{Overall Performance}} \\ \hline
+Measured & placeholder_overall_performance\% \\ \hline
+Cost Modulation & placeholder_overall_cost_modulation\% \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Performance Classes}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|r|}
+\hline
+\textbf{Performance Classes} & \textbf{Overall Performance} & \textbf{Cost Modulation} \\ \hline
+Performance Class 1 & From 98\% to 100\% & 100.00\% \\ \hline
+Performance Class 2 & From 95\% to 98\% & 97.50\% \\ \hline
+Performance Class 3 & From 85\% to 95\% & 95.00\% \\ \hline
+Performance Class 4 & From 50\% to 85\% & 90.00\% \\ \hline
+Performance Class 5 & Below 50\% & 85.00\% \\ \hline
+\end{tabular}
+\end{table}
+
+\section{KPI-0010}
+
+\subsection{Availability of the Website}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\multicolumn{2}{|c|}{\textbf{Website Availability}}                    \\ \hline
+Number of Availability Checks of the Data Hub Relay & placeholder_website_checks \\ \hline
+Number of Successful Availability Checks of the Data Hub Relay & placeholder_website_checks_successful \\ \hline
+Measured Percentage & placeholder_website_checks_percentage\% \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Availability of the Database and Products}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\multicolumn{2}{|c|}{\textbf{Database/Productivity Availability}} \\ \hline
+Number of Availability Checks of the Database/Products & placeholder_database_checks \\ \hline
+Number of Successful Availability Checks of the Database/Products & placeholder_database_checks_successful \\ \hline
+Measured Percentage & placeholder_database_checks_percentage\% \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Overall KPI-0010}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\multicolumn{2}{|c|}{\textbf{Overall KPI-0010}} \\ \hline
+Measured Percentage & placeholder_kpi1_percentage\% \\ \hline
+Cost Modulation & placeholder_kpi1_cost_modulation\% \\ \hline
+\end{tabular}
+\end{table}
+
+\section{KPI-0020}
+
+\subsection{Individual Delay of Different Products}
+
+\begin{table}[H]
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{|l|l|l|l|l|l|l|c|}
+\hline
+\multicolumn{7}{|c|}{\textbf{Individual Delay}} \\ \hline
+\textbf{Product/Data Source} & \textbf{colhub}              & \textbf{colhub2} & \textbf{colhub3} & \textbf{grnet} & \textbf{cesnet} & \textbf{met.no} & \textbf{Performance} \\ \hline
+S1-SLC                       & placeholder_s1slc_time_diff  &                  &                  &                &                 &                 & placeholder_s1slc_percentage\% \\ \hline
+S1                           & placeholder_s1_time_diff     &                  &                  &                &                 &                 & placeholder_s1_percentage\% \\ \hline
+S2A-L1C                      & placeholder_s2al1c_time_diff &                  &                  &                &                 &                 & placeholder_s2al1c_percentage\% \\ \hline
+S2B-L1C                      & placeholder_s2bl1c_time_diff &                  &                  &                &                 &                 & placeholder_s2bl1c_percentage\% \\ \hline
+S2A-L2A                      & placeholder_s2al2a_time_diff &                  &                  &                &                 &                 & placeholder_s2al2a_percentage\% \\ \hline
+S2B-L2A                      & placeholder_s2bl2a_time_diff &                  &                  &                &                 &                 & placeholder_s2bl2a_percentage\% \\ \hline
+S3                           & placeholder_s3_time_diff     &                  &                  &                &                 &                 & placeholder_s3_percentage\% \\ \hline
+S5                           & placeholder_s5_time_diff     &                  &                  &                &                 &                 & placeholder_s5_percentage\% \\ \hline
+\textbf{Average} & \textbf{placeholder_colhub1_time_diff}
+                 & \textbf{placeholder_colhub2_time_diff}
+                 & \textbf{placeholder_colhub3_time_diff}
+                 & \textbf{placeholder_grnet_time_diff}
+                 & \textbf{placeholder_cesnet_time_diff}
+                 & \textbf{placeholder_metno_time_diff}
+                 & \textbf{placeholder_average_percentage}\% \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+\subsection{Overall KPI-0020}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\multicolumn{2}{|c|}{\textbf{Overall KPI-0020}} \\ \hline
+Time Difference & placeholder_kpi2_time_diff \\ \hline
+Cost Modulation & placeholder_kpi2_cost_modulation\% \\ \hline
+\end{tabular}
+\end{table}
+
+\end{document}

@@ -1,0 +1,12 @@
+# cached files
+*__pycache__/
+*pyc
+
+# generated db and reports
+*db/
+excel_reports/
+pdf_reports/
+
+# secrets and passwords
+*secret.py
+env
