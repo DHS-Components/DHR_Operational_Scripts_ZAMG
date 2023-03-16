@@ -1,0 +1,13 @@
+<VirtualHost *:80>
+        ServerName {{ ansible_fqdn }}
+        ServerAlias {{ ansible_fqdn }}
+        ServerAdmin {{ admin_email }}
+
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+        Redirect / /dhus/
+
+        ProxyPass /dhus http://localhost:8081
+        ProxyPassReverse /dhus http://localhost:8081
+</VirtualHost>

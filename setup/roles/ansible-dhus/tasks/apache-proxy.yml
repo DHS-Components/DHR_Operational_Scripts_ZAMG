@@ -1,0 +1,35 @@
+---
+- name: Install apache
+  apt:
+    name: apache2
+
+- name: Enable Modules for Apache2
+  apache2_module:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - ssl
+    - proxy_http
+
+- name: Copy sites to remote host
+  template:
+    src: "{{ apache_config_file }}.j2"
+    dest: "/etc/apache2/sites-available/{{ apache_config_file }}"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Activate apache sites
+  command: a2ensite "{{ apache_config_file }}"
+
+- name: Deactivate default apache sites
+  command: a2dissite "{{ item }}"
+  with_items:
+    - 000-default.conf
+    - default-ssl.conf
+
+- name: Reload and enable apache2
+  systemd:
+    name: apache2
+    enabled: yes
+    daemon_reload: yes

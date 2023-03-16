@@ -1,0 +1,9 @@
+---
+- name: Setup DHuS on localhost
+  hosts: localhost
+  vars_prompt:
+    - name: product
+      prompt: Which product would you like to install? Choose one of [s1, s2a-l1c, s2b-l1c, s2-l2a, s3, s5, dhr, dhs]
+      private: no
+  roles:
+    - ansible-dhus

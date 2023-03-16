@@ -1,0 +1,7 @@
+apt_packages:
+  - default-jre-headless
+  - python3-pip
+  - libpq-dev
+
+pip_packages:
+  - psycopg2

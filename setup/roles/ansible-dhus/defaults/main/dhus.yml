@@ -1,0 +1,24 @@
+dhus_group:
+  name: dhus
+  gid: 1010
+
+dhus_user:
+  name: dhus
+  uid: 1010
+  group: dhus
+  groups: []
+  fullname: dhus
+  homedir: /home/dhus
+  shell: /bin/bash
+
+dhus_name: "dhus"
+
+dhus_path: "{{ parent_directory }}/dhus"
+dhus_working_path: "{{ dhus_path }}/working"
+install_path: "{{ dhus_path }}-{{ dhus_version }}"
+
+dhus_service: "/etc/systemd/system/dhus.service"
+dhus_download: "https://github.com/SentinelDataHub/dhus-distribution/releases/download/{{ dhus_version }}-osf/dhus-software-{{ dhus_version }}-osf-distribution.shar"
+dhus_download_hash: "https://github.com/SentinelDataHub/dhus-distribution/releases/download/{{ dhus_version }}-osf/dhus-software-{{ dhus_version }}-osf-distribution.shar.sha1"
+
+tomcat_path: "{{ dhus_path }}/tomcat"

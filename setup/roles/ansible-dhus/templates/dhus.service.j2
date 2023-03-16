@@ -1,0 +1,16 @@
+[Unit]
+Description = DHuS service
+After       = network.target network-online.target dbus.service postgresql.service postgresql@{{ postgresql_version }}-main.service
+Requires    = dbus.service
+
+[Service]
+Type                = simple
+WorkingDirectory    = {{ dhus_path }}
+ExecStart           = {{ dhus_path }}/start.sh
+ExecStop            = {{ dhus_path }}/stop.sh
+PIDFile             = {{ dhus_path }}/dhus.pid
+Restart             = always
+User                = {{ dhus_user.name }}
+
+[Install]
+WantedBy    = multi-user.target

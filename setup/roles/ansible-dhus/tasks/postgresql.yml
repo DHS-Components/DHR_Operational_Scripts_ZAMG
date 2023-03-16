@@ -1,0 +1,150 @@
+---
+- name: Install postgresql
+  apt:
+    name: "{{ postgresql_package }}"
+
+- name: Set variables according to chosen product
+  set_fact:
+    postgresql_data_dir: "{{ item.postgresql_data_dir }}"
+    postgresql_dump_folder: "{{ item.postgresql_dump_folder }}"
+  loop: "{{ lookup('list', products) }}"
+  when: product == item.name
+
+- name: Create a postgresql data directory
+  file:
+    dest: "{{ postgresql_data_dir }}"
+    state: directory
+    group: "{{ postgresql_group }}"
+    owner: "{{ postgresql_user }}"
+
+- name: Init postgresql database
+  command: "/usr/lib/postgresql/{{ postgresql_version }}/bin/initdb -D {{ postgresql_data_dir }}"
+  become: yes
+  become_method: su
+  become_user: "{{ postgresql_user }}"
+  ignore_errors: yes
+
+- name: Change the postgresql.conf configuration file
+  template:
+    src: postgresql.conf.j2
+    dest: "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    mode: 0644
+
+- name: Change the pg_hba.conf configuration file
+  template:
+    src: pg_hba.conf.j2
+    dest: "/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    mode: 0644
+
+- name: Adjust postgresql systemd service
+  lineinfile:
+    path: /lib/systemd/system/postgresql@.service
+    regexp: 'After=network.target'
+    line: After=network-online.target database.mount
+
+- name: Restart postgresql
+  service:
+    name: postgresql
+    state: restarted
+
+- name: Change the postgresql standard user password
+  postgresql_user:
+    user: "{{ postgresql_user }}"
+    password: "{{ postgresql_user_password }}"
+    login_unix_socket: /var/run/postgresql
+  become: true
+  become_method: su
+  become_user: "{{ postgresql_user }}"
+
+- name: Create a new DHuS database user
+  postgresql_user:
+    user: "{{ postgresql_dhus_user }}"
+    password: "{{ postgresql_dhus_user_password }}"
+    role_attr_flags: "{{ postgresql_dhus_user_roles }}"
+    login_unix_socket: /var/run/postgresql
+  become: true
+  become_method: su
+  become_user: "{{ postgresql_user }}"
+
+- name: Create new DHuS database
+  postgresql_db:
+    name: "{{ postgresql_dhus_database }}"
+    owner: "{{ postgresql_dhus_user }}"
+    encoding: "{{ postgresql_dhus_database_encoding }}"
+    conn_limit: "{{ postgresql_dhus_database_conn_limit }}"
+    template: template0
+    state: present
+    login_unix_socket: /var/run/postgresql
+  become: true
+  become_method: su
+  become_user: "{{ postgresql_user }}"
+
+- name: Add extension to database
+  postgresql_ext: 
+    db: "{{ postgresql_dhus_database }}"
+    name: "{{ postgresql_dhus_database_ext }}"
+    state: present
+    login_unix_socket: /var/run/postgresql
+  become: true
+  become_method: su
+  become_user: "{{ postgresql_user }}"
+
+- name: Create a dump folder for the postgres database dumps
+  file:
+    dest: "{{ postgresql_dump_folder }}"
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    state: directory
+
+- name: Create a folder for postgres scripts
+  file:
+    dest: /var/lib/postgresql/bin
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    state: directory
+
+- name: Copy the pgsql dump script
+  copy:
+    src: create_pgsql_dump.sh
+    dest: /var/lib/postgresql/bin/create_pgsql_dump.sh
+    owner: "{{ postgresql_user }}"
+    group: "{{ postgresql_group }}"
+    mode: 0755
+
+- name: Create a cronjob to periodically execute the dump script
+  cron:
+    name: taking a psql dump once a day
+    minute: "55"
+    hour: "23"
+    job: "/var/lib/postgresql/bin/create_pgsql_dump.sh dhus {{ postgresql_dump_folder }} 5"
+    user: postgres
+
+- name: Import Java Library for Postgres
+  get_url:
+    url: "{{ java_postgresql_library_link }}"
+    dest: "{{ install_path }}/lib/{{ java_postgresql_library_name }}"
+    owner: "{{ dhus_user.name }}"
+    group: "{{ dhus_user.group }}"
+    mode: '0644'
+
+- name: Updating postgresql database with script from DHuS
+  command:
+    argv:
+      - "./updateDatabase.sh"
+      - "org.postgresql.Driver"
+      - "jdbc:postgresql://127.0.0.1:5432/dhus"
+      - "{{ postgresql_dhus_user }}"
+      - "{{ postgresql_dhus_user_password }}"
+    chdir: "{{ dhus_path }}"
+  become: true
+  become_method: su
+  become_user: "{{ dhus_user.name }}"
+
+- name: Clean up obsolete files
+  file:
+    dest: "{{ install_path }}/dhus.xml"
+    state: absent

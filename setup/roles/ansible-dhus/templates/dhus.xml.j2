@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<conf:configuration xmlns:conf="fr.gael.dhus.database.object.config" xmlns:search="fr.gael.dhus.database.object.config.search" xmlns:product="fr.gael.dhus.database.object.config.product" xmlns:ds="org.dhus.store.datastore.config" xmlns:scanner="fr.gael.dhus.database.object.config.scanner" xmlns:source="fr.gael.dhus.database.object.config.source" xmlns:network="fr.gael.dhus.database.object.config.network" xmlns:msg="fr.gael.dhus.database.object.config.messaging" xmlns:server="fr.gael.dhus.database.object.config.server" xmlns:evict="fr.gael.dhus.database.object.config.eviction" xmlns:cron="fr.gael.dhus.database.object.config.cron" xmlns:sync="fr.gael.dhus.database.object.config.synchronizer" xmlns:system="fr.gael.dhus.database.object.config.system" workingDir="{{ dhus_working_path }}">
+    <conf:crons>
+        <cron:archiveSynchronization active="false" schedule="0 0 0/5 ? * *"/>
+        <cron:cleanDatabase active="false" schedule="0 0 1 ? * *">
+            <cron:tempUsers keepPeriod="10"/>
+            <cron:statistics keepPeriod="90"/>
+        </cron:cleanDatabase>
+        <cron:cleanDatabaseDump active="false" keep="10" schedule="0 0 4 ? * *"/>
+        <cron:dumpDatabase active="false" schedule="0 0 3 ? * *"/>
+        <cron:searches active="false" schedule="0 0 5 ? * *"/>
+        <cron:sendLogs active="false" addresses="{{ admin_email }}" schedule="0 55 23 ? * *"/>
+        <cron:systemCheck active="false" schedule="0 30 23 ? * *"/>
+    </conf:crons>
+    <conf:messaging>
+        <msg:mail onUserCreate="true" onUserDelete="true" onUserUpdate="true">
+            <msg:server password="{{ admin_email_password }}" port="25" smtp="localhost" tls="false" username="{{ admin_email }}">
+                <msg:from address="{{ admin_email }}" name="DHuS Support Team"/>
+                <msg:replyTo>{{ admin_email }}</msg:replyTo>
+            </msg:server>
+        </msg:mail>
+    </conf:messaging>
+    <conf:network>
+        <network:outbound>
+            <network:channel name="PriorityChannel" weight="75">
+                <network:classifier>
+                    <network:includes>
+                        <network:include>
+                            <network:userEmailPattern>.*@gael.fr</network:userEmailPattern>
+                        </network:include>
+                    </network:includes>
+                </network:classifier>
+            </network:channel>
+            <network:channel name="SelfRegisteredChannel" weight="25">
+                <network:defaultUserQuotas>
+                    <network:maxConcurrent>30</network:maxConcurrent>
+                </network:defaultUserQuotas>
+            </network:channel>
+        </network:outbound>
+        <network:inbound>
+            <network:channel name="PriorityChannel" weight="75">
+                <network:classifier>
+                    <network:includes>
+                        <network:include>
+                            <network:userEmailPattern>.*@gael.fr</network:userEmailPattern>
+                        </network:include>
+                    </network:includes>
+                </network:classifier>
+            </network:channel>
+            <network:channel name="SelfRegisteredChannel" weight="25">
+                <network:defaultUserQuotas>
+                    <network:maxConcurrent>30</network:maxConcurrent>
+                </network:defaultUserQuotas>
+            </network:channel>
+        </network:inbound>
+    </conf:network>
+    <conf:products>
+        <product:download compressionLevel="4" checksumAlgorithms="MD5"/>
+        <product:quicklook cutting="false" height="512" width="512"/>
+        <product:thumbnail cutting="false" height="64" width="64"/>
+    </conf:products>
+    <conf:search>
+        <search:geocoder url="http://nominatim.openstreetmap.org">
+            <search:nominatim boundingBox="false" maxPointNumber="50"/>
+            <search:geoname username="dhus"/>
+        </search:geocoder>
+        <search:odata defaultTop="50"/>
+        <search:solr core="dhus" path="{{ solr_path }}" schemaPath="" synonymPath=""/>
+    </conf:search>
+    <conf:server>
+        <server:external/>
+    </conf:server>
+    <conf:system>
+        <system:administrator name="{{ admin_username }}" password="{{ admin_username_password }}"/>
+        <system:archive/>
+        <system:database JDBCDriver="org.postgresql.Driver" hibernateDialect="org.hibernate.dialect.PostgreSQLDialect" JDBCUrl="{{ postgresql_jdbc_url }}" login="{{ postgresql_user }}" password="{{ postgresql_user_password }}"/>
+        <system:name long="Data Hub Relay" short="DHR"/>
+        <system:processing corePoolSize="12"/>
+        <system:support mail="{{ admin_email }}" name="Sentinel Data Hub Relay" registrationMail="{{ admin_email }}"/>
+        <system:tomcat path="{{ tomcat_path }}"/>
+        <system:executor enabled="true" batchModeEnabled="false"/>
+        <system:trashPath/>
+        <system:transformation/>
+    </conf:system>
+    <conf:dataStores>
+        ###PLACEHOLDER_DATASTORE###
+    </conf:dataStores>
+    <conf:scanners/>
+    <conf:synchronizers>
+        ###PLACEHOLDER_SYNCHRONIZER###
+    </conf:synchronizers>
+    <conf:evictions/>
+        {% if product.startswith('s') %}
+        <evict:eviction name="Delete products older than 21 days" keepPeriod="21" keepPeriodUnit="DAYS" maxEvictedProducts="100" softEviction="false" status="STARTED" safeMode="false" baseDate="modificationDate">
+            <evict:cron active="true" schedule="0 0/2 * * * ?"/>
+        </evict:eviction>
+        {% endif %}
+    <conf:sources/>
+</conf:configuration>

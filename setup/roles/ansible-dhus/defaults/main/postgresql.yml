@@ -1,0 +1,44 @@
+---
+postgresql_package: "postgresql-{{ postgresql_version }}"
+postgresql_user: postgres
+postgresql_group: postgres
+
+java_postgresql_library_name: "postgresql-42.5.0.jar"
+java_postgresql_library_link: "https://jdbc.postgresql.org/download/{{ java_postgresql_library_name }}"
+
+postgresql_jdbc_url: "jdbc:postgresql://127.0.0.1:5432/dhus"
+
+# from DHuS Configuration Manual
+postgresql_log_dest: csvlog
+postgresql_log_dir: pg_log
+postgresql_logging_collector: 'on'
+postgresql_log_filename: 'postgres-%Y-%m-%d_%H%M%S'
+postgresql_log_rotation_age: 1d
+postgresql_rotation_size: 1GB
+postgresql_log_min_duration_statement: 250ms
+postgresql_log_checkpoints: 'on'
+postgresql_log_connections: 'on'
+postgresql_log_disconnections: 'on'
+postgresql_lock_waits: 'on'
+postgresql_log_temp_files: 0
+postgresql_max_connections: 1000
+postgresql_shared_buffers: 8GB
+## postgresql_effective_cache_size is the only deviation: 96GB according to DHuS Configuration Manual
+postgresql_effective_cache_size: "{{ (ansible_memory_mb.real.total * 2/3) | int }}MB" # should be set to 1/2 - 2/3 of RAM size according to https://wiki.postgresql.org/wiki/Tuning_Your_PostgreSQL_Server
+postgresql_work_mem: 33554kB
+postgresql_maintenance_work_mem: 2GB
+postgresql_min_wal_size: 1GB
+postgresql_max_wal_size: 2GB
+postgresql_checkpoint_completion_target: 0.9
+postgresql_wal_buffers: 16MB
+postgresql_default_statistics_target: 100
+postgresql_fsync: 'on'
+
+# Postgresql DHuS Database
+postgresql_dhus_database: dhus
+postgresql_dhus_database_encoding: UTF-8
+postgresql_dhus_database_conn_limit: '-1'
+postgresql_dhus_database_ext: uuid-ossp
+postgresql_dhus_user: dhus
+postgresql_dhus_user_roles: 'LOGIN,CREATEDB,INHERIT,REPLICATION'
+postgresql_dhus_auth_method: password

@@ -1,0 +1,26 @@
+---
+- name: Install apt packages
+  apt:
+    name: "{{ item }}"
+  loop: "{{ apt_packages }}"
+
+- name: Install pip packages
+  pip:
+    name: "{{ item }}"
+  loop: "{{ pip_packages }}"
+
+- name: Create dhus group
+  group:
+    name: "{{ dhus_group.name }}"
+    gid: "{{ dhus_group.gid }}"
+
+- name: Create dhus user
+  user:
+    name: "{{ dhus_user.name }}"
+    uid: "{{ dhus_user.uid }}"
+    group: "{{ dhus_user.group }}"
+    groups: "{{ dhus_user.groups }}"
+    comment: "{{ dhus_user.fullname }}"
+    home: "{{ dhus_user.homedir }}"
+    shell: "{{ dhus_user.shell }}"
+    create_home: yes
