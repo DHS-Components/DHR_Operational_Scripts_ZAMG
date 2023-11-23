@@ -1,5 +1,5 @@
 ---
-postgresql_version: 15
+postgresql_version: 13
 postgresql_user_password: "POSTGRES_USER_PASSWORDS"
 postgresql_dhus_user_password: "DHUS_USER_PASSWORD"
 # PostgreSQL trusted IP's

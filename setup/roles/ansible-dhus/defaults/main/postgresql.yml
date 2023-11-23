@@ -3,7 +3,7 @@ postgresql_package: "postgresql-{{ postgresql_version }}"
 postgresql_user: postgres
 postgresql_group: postgres
 
-java_postgresql_library_name: "postgresql-42.6.0.jar"
+java_postgresql_library_name: "postgresql-42.5.0.jar"
 java_postgresql_library_link: "https://jdbc.postgresql.org/download/{{ java_postgresql_library_name }}"
 
 postgresql_jdbc_url: "jdbc:postgresql://127.0.0.1:5432/dhus"

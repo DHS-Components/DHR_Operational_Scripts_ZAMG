@@ -1,23 +1,19 @@
 ---
 # DOWNLOADING
-- name: ansible-dhus | dhus | Create a new instance/service directory
+- name: Create a new instance/service directory
   file:
     path: "{{ install_path }}"
     owner: "{{ dhus_user.name }}" 
     group: "{{ dhus_group.name }}"
     state: directory
-  tags:
-    - dhus
 
-- name: ansible-dhus | dhus | Get DHuS software checksum
+- name: Get DHuS software checksum
   uri:
     url: "{{ dhus_download_hash }}"
     return_content: true
   register: url_sha1
-  tags:
-    - dhus
 
-- name: ansible-dhus | dhus | Download DHuS software
+- name: Download DHuS software
   get_url:
     url: "{{ dhus_download }}"
     dest: "{{ install_path }}/dhus-{{ dhus_version }}.shar"
@@ -25,77 +21,61 @@
     owner: "{{ dhus_user.name }}"
     group: "{{ dhus_group.name }}"
     mode: "0700"
-  tags:
-    - dhus
 
 # PREPARE INSTALL
-- name: ansible-dhus | dhus | Remove line which interferes with removing the shell script from the downloaded file
+- name: Remove line which interferes with removing the shell script from the downloaded file
   lineinfile:
     path: "{{ install_path }}/dhus-{{ dhus_version }}.shar"
     line: "SKIP=`awk '/^__ARCHIVE_FOLLOWS__/ { print NR + 1; exit 0; }' $0`"
     state: absent
-  tags:
-    - dhus
 
-- name: ansible-dhus | dhus | Remove shell script in downloaded dhus software file
+- name: Remove shell script in downloaded dhus software file
   replace:
     path: "{{ install_path }}/dhus-{{ dhus_version }}.shar"
     regexp: "[^$]"
     after: "#!/bin/bash"
     before: "__ARCHIVE_FOLLOWS__\n"
-  tags:
-    - dhus
 
-- name: ansible-dhus | dhus | Remove first line still containing markers
+- name: Remove first line still containing markers
   lineinfile:
     path: "{{ install_path }}/dhus-{{ dhus_version }}.shar"
     regexp: "#!/bin/bash.*__ARCHIVE_FOLLOWS__"
     state: absent
-  tags:
-    - dhus
 
 # INSTALL
-- name: ansible-dhus | dhus | Install dhus software
+- name: Install DHuS software
   command:
     cmd: "tar -xzf dhus-{{ dhus_version }}.shar -C {{ install_path }}"
     chdir: "{{ install_path }}"
   become: yes
   become_method: su
   become_user: "{{ dhus_user.name }}"
-  tags:
-    - dhus
 
-- name: ansible-dhus | dhus | Create a symlink for the new DHuS software
+- name: Create a symlink for the new DHuS software
   file:
     owner: "{{ dhus_user.name }}"
     group: "{{ dhus_group.name }}"
     state: link
     src: "{{ install_path }}"
     dest: "{{ dhus_path }}"
-  tags:
-    - dhus
 
 # CONFIGURE
-- name: ansible-dhus | dhus | Set variables according to chosen product
+- name: Set variables according to chosen product
   set_fact:
     solr_path: "{{ item.solr_path }}"
     synchronizer_block: ""
     datastore_block: ""
   loop: "{{ lookup('list', products) }}"
   when: product == item.name
-  tags:
-    - dhus
 
-- name: ansible-dhus | dhus | Create solr folder
+- name: Create solr folder
   file:
     dest: "{{ solr_path }}"
     owner: "{{ dhus_user.name }}"
     group: "{{ dhus_group.name }}"
     state: directory
-  tags:
-    - dhus
 
-- name: ansible-dhus | dhus | Configure DHuS software
+- name: Configure DHuS software
   template:
     src: dhus.xml.j2
     dest: "{{ install_path }}/etc/dhus.xml"
@@ -103,10 +83,8 @@
     group: "{{ dhus_group.name }}"
     mode: 0644
     backup: yes
-  tags:
-    - dhus
 
-- name: ansible-dhus | dhus | Prepare synchronizer block
+- name: Prepare synchronizer block
   set_fact:
     synchronizer_block: |
         {{ synchronizer_block }}<sync:synchronizer xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="sync:productSynchronizer" retriesForSkippedProducts="3" timeoutSkippedProducts="60000">
@@ -129,18 +107,14 @@
         </sync:synchronizer>
   loop: "{{ query('subelements', products, 'synchronizer', wantlist=True) }}"
   when: product == item.0.name
-  tags:
-    - dhus
 
-- name: ansible-dhus | dhus | Write synchronizer block to dhus.xml file
+- name: Write synchronizer block to dhus.xml file
   replace:
     path: "{{ install_path }}/etc/dhus.xml"
     regexp: "###PLACEHOLDER_SYNCHRONIZER###"
     replace: "{{ synchronizer_block }}"
-  tags:
-    - dhus
 
-- name: ansible-dhus | dhus | Prepare datastore block
+- name: Prepare datastore block
   set_fact:
     datastore_block: |
         {{ datastore_block }}<ds:dataStore xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ds:hfsDataStoreConf" name="{{ item.1.storage_name }}" restriction="{{ item.1.restriction }}" priority="0" {% if item.1.maximumSize|length > 0 %}maximumSize="{{ item.1.maximumSize }}"{% endif %} {% if item.1.autoEviction|length > 0 %}autoEviction="{{ item.1.autoEviction }}"{% endif %}>
@@ -151,15 +125,13 @@
   loop: "{{ query('subelements', products, 'datastore', wantlist=True) }}"
   when: product == item.0.name
 
-- name: ansible-dhus | dhus | Write datastore block to dhus.xml file
+- name: Write datastore block to dhus.xml file
   replace:
     path: "{{ install_path }}/etc/dhus.xml"
     regexp: "###PLACEHOLDER_DATASTORE###"
     replace: "{{ datastore_block }}"
-  tags:
-    - dhus
 
-- name: ansible-dhus | dhus | Create log configuration file
+- name: Create log configuration file
   template:
     src: log4j2.xml.j2
     dest: "{{ install_path }}/etc/log4j2.xml"
@@ -168,10 +140,8 @@
     mode: '0644'
   loop: "{{ lookup('list', products) }}"
   when: product == item.name
-  tags:
-    - dhus
 
-- name: ansible-dhus | dhus | Create log path
+- name: Create log path
   file:
     dest: "{{ item.log_path }}"
     owner: "{{ dhus_user.name }}"
@@ -179,10 +149,8 @@
     state: directory
   loop: "{{ lookup('list', products) }}"
   when: product == item.name
-  tags:
-    - dhus
 
-- name: ansible-dhus | dhus | Create datastore paths
+- name: Create datastore paths
   file:
     dest: "{{ item.1.storage_path }}"
     owner: "{{ dhus_user.name }}"
@@ -190,32 +158,24 @@
     state: directory
   loop: "{{ query('subelements', products, 'datastore', wantlist=True) }}"
   when: product == item.0.name
-  tags:
-    - dhus
 
-- name: ansible-dhus | dhus | Configure start.sh script to use correct amount of RAM
+- name: Configure start.sh script to use correct amount of RAM
   replace:
     path: "{{ install_path }}/start.sh"
     regexp: "-Xms12g -Xmx12g"
     replace: "-Xms{{ (ansible_memory_mb.real.total / 2) | int }}m -Xmx{{ (ansible_memory_mb.real.total - 1024) | int }}m"
-  tags:
-    - dhus
 
-- name: ansible-dhus | dhus | Fix permissions on all DHuS files
+- name: Fix permissions on all DHuS files
   file:
     dest: "{{ install_path }}"
     owner: "{{ dhus_user.name }}" 
     group: "{{ dhus_group.name }}"
     recurse: yes
-  tags:
-    - dhus
   
-- name: ansible-dhus | dhus | Create a service for DHuS
+- name: Create a service for DHuS
   template:
     src: dhus.service.j2
     dest: "/etc/systemd/system/{{ dhus_name }}.service"
     owner: "{{ dhus_user.name }}"
     group: "{{ dhus_group.name }}"
     mode: '0644'
-  tags:
-    - dhus

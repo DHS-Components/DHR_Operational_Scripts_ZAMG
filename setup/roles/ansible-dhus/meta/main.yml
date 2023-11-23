@@ -1,5 +1,5 @@
 galaxy_info:
-  author: Simon Kropf, Stefan Buchberger
+  author: Simon Kropf
   description: This role is used to setup the DHuS software stack.
   company: Geosphere Austria
 

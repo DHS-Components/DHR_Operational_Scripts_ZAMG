@@ -1,7 +1,7 @@
 ---
 parent_directory: "/opt"
 
-dhus_version: "3.0.8-3"
+dhus_version: "3.0.8"
 
 admin_username: "dhr"
 admin_username_password: "USE_ANSIBLE_VAULT_PASSWORD"
